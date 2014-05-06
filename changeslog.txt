@@ -1,0 +1,12 @@
+v0.6
+- La aplicación cumple con el modelo de POO
+- Implementación del algoritmos de bisección para el descubrimento del número de registros
+- Implementación del algoritmos de bisección para el descubrimento de la longitud del registro actual
+- Implementación del algoritmos de bisección para el descubrimento del contenido de cada registro usando solo el intervalo de caracteres imprimibles
+
+v0.5
+- Descubrimento secuencial de número de registros
+- Descubrimento secuencial de longitud del registro actual
+- Descubrimiento de contenido por iteración de lista de caracteres
+- Salida a pantalla del progreso de descubrimiento
+- Salida a pantalla de listado de resultados obtenidos
